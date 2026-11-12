@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>PLANine uživo</title>
+<link rel="stylesheet" href="leaflet.css">
+<style>
+  :root { --bg:#fff; --fg:#1a1c19; --mut:#5b6159; --card:#f3f5f0; --ok:#2e7d32; --warn:#b26a00; --end:#6b6f68; --pr:#1f6b3a; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#101410; --fg:#e4e8e0; --mut:#9aa396; --card:#1b211b; --ok:#7bd88f; --warn:#ffb74d; --end:#9aa396; --pr:#7bd88f; } }
+  html, body { height:100%; margin:0; background:var(--bg); color:var(--fg); font:16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #app { display:flex; flex-direction:column; height:100%; }
+  #map { flex:1; min-height:0; }
+  #panel { background:var(--card); padding:12px 16px calc(12px + env(safe-area-inset-bottom)); border-top:1px solid rgba(128,128,128,.3); }
+  #title { font-weight:800; font-size:18px; display:flex; align-items:center; gap:8px; }
+  #dot { width:12px; height:12px; border-radius:50%; background:var(--end); flex:none; }
+  #dot.ok { background:var(--ok); animation:pulse 1.6s infinite; } #dot.warn { background:var(--warn); }
+  @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(46,125,50,.5)} 100%{box-shadow:0 0 0 10px rgba(46,125,50,0)} }
+  #status { color:var(--mut); margin-top:2px; }
+  #row { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .btn { appearance:none; border:1.5px solid var(--pr); color:var(--pr); background:transparent; border-radius:999px; padding:8px 14px; font:inherit; font-weight:700; text-decoration:none; cursor:pointer; }
+  .btn.on { background:var(--pr); color:var(--bg); }
+  #msg { padding:24px 16px; }
+  small { color:var(--mut); display:block; margin-top:8px; }
+  .me { width:18px; height:18px; border-radius:50%; background:#d32f2f; border:3px solid #fff; box-shadow:0 0 0 2px #d32f2f66; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="msg" hidden></div>
+  <div id="map"></div>
+  <div id="panel">
+    <div id="title"><span id="dot"></span><span id="who">PLANine uživo</span></div>
+    <div id="status">Čekam prvi položaj…</div>
+    <div id="row">
+      <button class="btn on" id="follow" type="button">Prati</button>
+      <a class="btn" id="osm" href="#" target="_blank" rel="noopener noreferrer">Otvori u kartama</a>
+    </div>
+    <small>Položaj se osvježava otprilike svake 3 minute dok osoba ima podatkovni signal. Karta: © OpenStreetMap suradnici.</small>
+  </div>
+</div>
+<script src="leaflet.js"></script>
+<script>
+(function () {
+  "use strict";
+  var topic = (location.hash || "").replace(/^#/, "");
+  var q = new URLSearchParams(location.search);
+  var server = (q.get("s") || "https://ntfy.sh").replace(/\/+$/, "");
+  var okServer = /^https:\/\/[A-Za-z0-9.-]+(:[0-9]{1,5})?$/.test(server) || /^http:\/\/(localhost|127\.0\.0\.1)(:[0-9]{1,5})?$/.test(server);
+  var $ = function (id) { return document.getElementById(id); };
+
+  function fail(text) {
+    $("msg").hidden = false; $("msg").textContent = text;
+    $("map").style.display = "none"; $("panel").style.display = "none";
+  }
+  if (!/^pl[a-z0-9]{28}$/.test(topic) || !okServer) { fail("Poveznica nije ispravna. Zatražite novu poveznicu od osobe koja dijeli lokaciju."); return; }
+
+  var map = L.map("map", { zoomControl: true }).setView([45.1, 15.2], 7);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap" }).addTo(map);
+  var line = L.polyline([], { color: "#d32f2f", weight: 4, opacity: .85 }).addTo(map);
+  var marker = null, circle = null;
+  var points = {};          // t -> [t, lat, lon, acc]
+  var seen = {};            // ntfy id -> true
+  var info = { name: "", battery: null, ended: false, last: null };
+  var follow = true, fitted = false;
+
+  function sorted() { return Object.keys(points).map(Number).sort(function (a, b) { return a - b; }).map(function (k) { return points[k]; }); }
+
+  function ago(sec) {
+    if (sec < 90) return "prije " + Math.max(1, Math.round(sec)) + " s";
+    var m = Math.round(sec / 60);
+    if (m < 90) return "prije " + m + " min";
+    var h = Math.floor(m / 60), r = m % 60;
+    return "prije " + h + " h" + (r ? " " + r + " min" : "");
+  }
+
+  function render() {
+    var pts = sorted();
+    line.setLatLngs(pts.map(function (p) { return [p[1], p[2]]; }));
+    if (!pts.length) return;
+    var last = pts[pts.length - 1];
+    info.last = last;
+    var ll = [last[1], last[2]];
+    if (!marker) {
+      marker = L.marker(ll, { icon: L.divIcon({ className: "", html: '<div class="me"></div>', iconSize: [18, 18], iconAnchor: [9, 9] }) }).addTo(map);
+      circle = L.circle(ll, { radius: Math.max(last[3], 5), color: "#d32f2f", weight: 1, fillOpacity: .08 }).addTo(map);
+    } else { marker.setLatLng(ll); circle.setLatLng(ll); circle.setRadius(Math.max(last[3], 5)); }
+    if (!fitted && pts.length > 1) { map.fitBounds(line.getBounds(), { padding: [40, 40], maxZoom: 16 }); fitted = true; }
+    else if (!fitted) { map.setView(ll, 16); fitted = true; }
+    else if (follow) { map.panTo(ll); }
+    $("osm").href = "https://www.openstreetmap.org/?mlat=" + last[1].toFixed(5) + "&mlon=" + last[2].toFixed(5) + "#map=16/" + last[1].toFixed(5) + "/" + last[2].toFixed(5);
+    status();
+  }
+
+  function status() {
+    var dot = $("dot"), st = $("status");
+    $("who").textContent = (info.name ? info.name + " – " : "") + "uživo";
+    if (!info.last) { st.textContent = "Čekam prvi položaj…"; return; }
+    var age = Date.now() / 1000 - info.last[0];
+    var bat = info.battery != null ? " · baterija " + info.battery + " %" : "";
+    if (info.ended) { dot.className = ""; st.textContent = "Dijeljenje je završilo. Zadnji položaj " + ago(age) + "." + bat; return; }
+    if (age > 8 * 60) { dot.className = "warn"; st.textContent = "Nema novih podataka (možda nema signala). Zadnji položaj " + ago(age) + "." + bat; return; }
+    dot.className = "ok"; st.textContent = "Zadnji položaj " + ago(age) + bat;
+  }
+
+  function onMessage(ev) {
+    var m; try { m = JSON.parse(ev.data); } catch (e) { return; }
+    if (!m || m.event !== "message" || !m.message || (m.id && seen[m.id])) return;
+    if (m.id) seen[m.id] = true;
+    var d; try { d = JSON.parse(m.message); } catch (e) { return; }
+    if (!d || d.v !== 1 || !Array.isArray(d.p)) return;
+    if (typeof d.n === "string") info.name = d.n;
+    if (typeof d.b === "number") info.battery = d.b;
+    info.ended = d.s === "end";
+    d.p.forEach(function (p) {
+      if (Array.isArray(p) && p.length >= 3 && isFinite(p[0]) && isFinite(p[1]) && isFinite(p[2]) && Math.abs(p[1]) <= 90 && Math.abs(p[2]) <= 180) points[p[0]] = [p[0], p[1], p[2], p[3] || 0];
+    });
+    render();
+  }
+
+  function connect() {
+    var es = new EventSource(server + "/" + topic + "/sse?since=all");
+    es.onmessage = onMessage;
+    es.onerror = function () { if ($("status").textContent.indexOf("Čekam") === 0) $("status").textContent = "Čekam vezu s poslužiteljem…"; };
+  }
+
+  $("follow").addEventListener("click", function () {
+    follow = !follow; this.classList.toggle("on", follow);
+    if (follow && info.last) map.panTo([info.last[1], info.last[2]]);
+  });
+  map.on("dragstart", function () { follow = false; $("follow").classList.remove("on"); });
+  setInterval(status, 10000);
+  connect();
+})();
+</script>
+</body>
+</html>
