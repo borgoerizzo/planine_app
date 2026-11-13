@@ -1,12 +1,12 @@
 {
-  "version": "3.4.02",
-  "apk": "PLANine-3.4.02.apk",
-  "sha256": "6e8b3fd98ac784d98392abf5ab630071c8f660e3772ccfdaa43dd38cc7e9f59c",
+  "version": "3.4.04",
+  "apk": "PLANine-3.4.04.apk",
+  "sha256": "775769ccf3264229cb1ddad0f582643b9971cd56fb8b425083d4426a2a050dd7",
   "bytes": 24196937,
   "notes": [
-    "Nove animacije prve pomoći i zvučni vodič za oživljavanje",
-    "Fotografije otrovnica, pravi kompas, nove teme u vodiču",
-    "Dijeljenje lokacije uživo i brzo dijeljenje Google Maps poveznice",
-    "Provjera nove verzije, potpunija sigurnosna kopija"
+    "Popravljen donji panel u Stazama (vidljiv na uređajima s navigacijskim tipkama i bez njih)",
+    "Zatvoreni panel pokazuje samo crticu i naslov",
+    "Dijeljenje lokacije uživo i brza tipka Podijeli lokaciju (Google Maps)",
+    "Nove animacije prve pomoći, zvučni vodič za oživljavanje, fotografije otrovnica"
   ]
 }
