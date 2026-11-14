@@ -1,11 +1,11 @@
 {
-  "version": "3.4.04",
-  "apk": "PLANine-3.4.04.apk",
-  "sha256": "775769ccf3264229cb1ddad0f582643b9971cd56fb8b425083d4426a2a050dd7",
+  "version": "3.4.05",
+  "apk": "PLANine-3.4.05.apk",
+  "sha256": "f0370ec909c010de6d9eb09b52927c1c44a43656f697761cb57be60527b99401",
   "bytes": 24196937,
   "notes": [
-    "Popravljen donji panel u Stazama (vidljiv na uređajima s navigacijskim tipkama i bez njih)",
-    "Zatvoreni panel pokazuje samo crticu i naslov",
+    "Prozor za ažuriranje se lista, pa je dostupna i tipka Preskoči ovu verziju",
+    "Popravljen donji panel u Stazama (uređaji s navigacijskim tipkama i bez njih)",
     "Dijeljenje lokacije uživo i brza tipka Podijeli lokaciju (Google Maps)",
     "Nove animacije prve pomoći, zvučni vodič za oživljavanje, fotografije otrovnica"
   ]
