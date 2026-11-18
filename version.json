@@ -1,12 +1,12 @@
 {
-  "version": "3.4.05",
-  "apk": "PLANine-3.4.05.apk",
-  "sha256": "f0370ec909c010de6d9eb09b52927c1c44a43656f697761cb57be60527b99401",
+  "version": "3.4.06",
+  "apk": "PLANine-3.4.06.apk",
+  "sha256": "174c94ee38ab8d68bf24226c9b899c7c978a5071a4a998e42e6a7b5e1b113eaf",
   "bytes": 24196937,
   "notes": [
+    "Ocjena prirode: može se odabrati više opcija odjednom (npr. šuma, kamenjar i rijeka)",
     "Prozor za ažuriranje se lista, pa je dostupna i tipka Preskoči ovu verziju",
     "Popravljen donji panel u Stazama (uređaji s navigacijskim tipkama i bez njih)",
-    "Dijeljenje lokacije uživo i brza tipka Podijeli lokaciju (Google Maps)",
-    "Nove animacije prve pomoći, zvučni vodič za oživljavanje, fotografije otrovnica"
+    "Dijeljenje lokacije uživo i brza tipka Podijeli lokaciju (Google Maps)"
   ]
 }
