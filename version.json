@@ -1,12 +1,12 @@
 {
-  "version": "3.5",
-  "apk": "PLANine-3.5.apk",
-  "sha256": "49031c61b8753610ea661c110df1482c4c9d1db11ab8859f14aa4558e979db5b",
+  "version": "3.5.01",
+  "apk": "PLANine-3.5.01.apk",
+  "sha256": "ce2520a1de6493a2e271347c5dcb980132b6952db03d7d6760c47d6a0a172498",
   "bytes": 24229733,
   "notes": [
-    "Vlastite markacije: dugi pritisak bilo gdje na karti dodaje oznaku s nazivom, napomenom i ikonom",
-    "Dodir na markaciju: uredi ili obriši; prikaz se uključuje u Karta i slojevi",
-    "Istraži: kategorija Vlastite, a filter Putovi se sada zove Staze",
-    "Markacije su u sigurnosnoj kopiji; izvoz i uvoz za dijeljenje s drugim korisnicima (Postavke)"
+    "Istraži → Vlastite: povucite ulijevo za brisanje, udesno za dijeljenje",
+    "Dugi pritisak odabire više markacija za dijeljenje ili brisanje",
+    "Uvezene markacije imaju oznaku Uvezeno",
+    "Vlastite markacije: dugi pritisak na karti dodaje oznaku; uvoz i izvoz u Postavkama"
   ]
 }
