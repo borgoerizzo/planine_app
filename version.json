@@ -1,12 +1,12 @@
 {
-  "version": "3.4.06",
-  "apk": "PLANine-3.4.06.apk",
-  "sha256": "174c94ee38ab8d68bf24226c9b899c7c978a5071a4a998e42e6a7b5e1b113eaf",
-  "bytes": 24196937,
+  "version": "3.5",
+  "apk": "PLANine-3.5.apk",
+  "sha256": "49031c61b8753610ea661c110df1482c4c9d1db11ab8859f14aa4558e979db5b",
+  "bytes": 24229733,
   "notes": [
-    "Ocjena prirode: može se odabrati više opcija odjednom (npr. šuma, kamenjar i rijeka)",
-    "Prozor za ažuriranje se lista, pa je dostupna i tipka Preskoči ovu verziju",
-    "Popravljen donji panel u Stazama (uređaji s navigacijskim tipkama i bez njih)",
-    "Dijeljenje lokacije uživo i brza tipka Podijeli lokaciju (Google Maps)"
+    "Vlastite markacije: dugi pritisak bilo gdje na karti dodaje oznaku s nazivom, napomenom i ikonom",
+    "Dodir na markaciju: uredi ili obriši; prikaz se uključuje u Karta i slojevi",
+    "Istraži: kategorija Vlastite, a filter Putovi se sada zove Staze",
+    "Markacije su u sigurnosnoj kopiji; izvoz i uvoz za dijeljenje s drugim korisnicima (Postavke)"
   ]
 }
